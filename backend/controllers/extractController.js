@@ -17,6 +17,6 @@ exports.extractText = (req, res) => {
         res.json({ extracted_text: JSON.parse(stdout) });
 
       
-        fs.unlinkSync(pdfPath);
+        // fs.unlinkSync(pdfPath);
     });
 };
