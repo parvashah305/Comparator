@@ -2,13 +2,27 @@ import difflib
 import json
 import pdfplumber
 
-def extract_text(pdf_path):
-    """ Extracts text from a PDF file using pdfplumber. """
+def extract_text_and_tables(pdf_path):
+    """ Extracts both text and tables from a PDF file. """
+    extracted_data = []
+
     try:
         with pdfplumber.open(pdf_path) as pdf:
-            text = "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
-        return text
-    except Exception:
+            for page in pdf.pages:
+              
+                text = page.extract_text()
+                if text:
+                    extracted_data.append(text)
+                
+            
+                tables = page.extract_tables()
+                for table in tables:
+                    table_text = "\n".join([" | ".join(row) for row in table if any(row)])
+                    extracted_data.append(table_text)
+
+        return "\n".join(extracted_data)
+
+    except Exception as e:
         return ""
 
 def compare_text(text1, text2):
@@ -33,7 +47,6 @@ def compare_text(text1, text2):
         elif not line.startswith("? "):  
             changes["unchanged"].append(line[2:])
 
-   
     refined_modifications = []
     for del_line in temp_deleted[:]:  
         for add_line in temp_added[:]:
@@ -71,8 +84,8 @@ if __name__ == "__main__":
     file1_path = sys.argv[1]
     file2_path = sys.argv[2]
 
-    text1 = extract_text(file1_path)
-    text2 = extract_text(file2_path)
+    text1 = extract_text_and_tables(file1_path)
+    text2 = extract_text_and_tables(file2_path)
 
     differences = compare_text(text1, text2)
 
