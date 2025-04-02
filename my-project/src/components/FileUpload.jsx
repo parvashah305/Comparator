@@ -36,8 +36,8 @@ const FileUpload = ({ onResult }) => {
     formData.append("file2", files[1]);
 
     try {
-      // const response = await axios.post("https://comparator-backend.vercel.app/api/compare", formData);
-      const response = await axios.post("http://localhost:3000/api/compare", formData);
+      const response = await axios.post("http://3.110.108.19:3000/api/compare", formData);
+      // const response = await axios.post("http://localhost:3000/api/compare", formData);
       onResult(response.data);
     } catch (error) {
       console.error("Error:", error);
