@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const { compareFiles } = require("../controllers/comapreController");
+const { compareFiles } = require("../controllers/compareController");
 
 const router = express.Router();
 
