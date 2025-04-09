@@ -1,19 +1,38 @@
 import sys
 import json
-import fitz  # PyMuPDF
+import pdfplumber
 
-def extract_text(pdf_path):
-    doc = fitz.open(pdf_path)
+def extract_text_and_tables(pdf_path):
     text = ""
-    for page in doc:
-        text += page.get_text("text") + "\n"
-    return text.strip()
+    tables = []
+
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text() + "\n"
+
+            page_tables = page.extract_tables()
+            for table in page_tables:
+                cleaned_table = [[str(cell).strip() if cell else "" for cell in row] for row in table]
+                tables.append(cleaned_table)
+
+    return text.strip(), tables
 
 if __name__ == "__main__":
     file1 = sys.argv[1]
     file2 = sys.argv[2]
 
-    text1 = extract_text(file1)
-    text2 = extract_text(file2)
+    text1, tables1 = extract_text_and_tables(file1)
+    text2, tables2 = extract_text_and_tables(file2)
 
-    print(json.dumps({"text1": text1, "text2": text2}))
+    result = {
+        "file1": {
+            "text": text1,
+            "tables": tables1
+        },
+        "file2": {
+            "text": text2,
+            "tables": tables2
+        }
+    }
+
+    print(json.dumps(result))
